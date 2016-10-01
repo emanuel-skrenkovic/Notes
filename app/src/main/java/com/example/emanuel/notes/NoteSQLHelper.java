@@ -51,7 +51,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
 
     public List<Note> listNotes() {
         List<Note> notesList = new ArrayList<>();
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query("notes",
                 new String[]{"NOTETEXT", "DATECREATED", "TIMECREATED"},
@@ -65,6 +65,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
             notesList.add(note);
         }
         cursor.close();
+        db.close();
         return notesList;
     }
 

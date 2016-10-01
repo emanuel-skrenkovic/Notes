@@ -1,45 +1,52 @@
 package com.example.emanuel.notes;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
-import java.util.List;
+public class NotesActivity extends Activity {
 
-public class NotesActivity extends AppCompatActivity {
+    private Cursor cursor;
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
 
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.activity_notes_linear);
-
-        List<Note> notesList = NoteSQLHelper.getInstance(getApplicationContext())
-                .listNotes();
-
-        int i = 0;
-        for (Note note : notesList) {
-            TextView noteView = new TextView(getApplicationContext());
-            noteView.setText(note.getNoteText());
-            noteView.setId(i);
-            linearLayout.addView(noteView);
-            i++;
-        }
-
-        /*linearLayout.setOnClickListener(new View.OnClickListener() {
+        ListView notesListView = (ListView) findViewById(R.id.notesListView);
+        notesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                switch(view.getId()) {
-                    case 1:
-
-                }
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(NotesActivity.this, NoteViewActivity.class);
+                intent.putExtra("noteId", view.getId());
+                startActivity(intent);
             }
-        });*/
+        });
+
+        db = NoteSQLHelper.getInstance(this).getReadableDatabase();
+
+        cursor = db.query("notes",
+                new String[]{"_id", "NOTETEXT", "DATECREATED", "TIMECREATED"},
+                null, null, null, null, null);
+
+        SimpleCursorAdapter notesListAdapter = new SimpleCursorAdapter(
+                this,
+                android.R.layout.simple_list_item_1,
+                cursor,
+                new String[]{"NOTETEXT"},
+                new int[]{android.R.id.text1},
+                0
+        );
+
+        notesListView.setAdapter(notesListAdapter);
 
         Button newNote = (Button) findViewById(R.id.newNoteButton);
         newNote.setOnClickListener(new View.OnClickListener() {
@@ -58,5 +65,12 @@ public class NotesActivity extends AppCompatActivity {
                         .deleteDb(getApplicationContext());
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cursor.close();
+        db.close();
     }
 }
