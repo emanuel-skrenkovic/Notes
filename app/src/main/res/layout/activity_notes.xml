@@ -35,5 +35,4 @@
         android:id="@+id/notesListView">
     </ListView>
 
-
 </RelativeLayout>
