@@ -6,12 +6,11 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -33,6 +32,9 @@ public class NotesActivity extends AppCompatActivity {
 
         NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
         ListView notesListView = (ListView) findViewById(R.id.notesListView);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.notesToolbar);
+        setSupportActionBar(toolbar);
 
         notesListView.setOnItemClickListener((adapterView, view, i, l) ->{
             Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);

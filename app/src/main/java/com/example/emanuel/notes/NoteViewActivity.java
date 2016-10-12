@@ -6,6 +6,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +27,10 @@ public class NoteViewActivity extends AppCompatActivity {
         final CustomEditText noteText = (CustomEditText) findViewById(R.id.text);
         TextView dateCreated = (TextView) findViewById(R.id.dateCreated);
         TextView timeCreated = (TextView) findViewById(R.id.timeCreated);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.noteViewToolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         final NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
 
@@ -74,6 +80,12 @@ public class NoteViewActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_note, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

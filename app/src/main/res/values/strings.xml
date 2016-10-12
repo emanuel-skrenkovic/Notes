@@ -7,4 +7,5 @@
     <string name="delete">Delete</string>
     <string name="deleted">Note Deleted</string>
     <string name="test">Test</string>
+    <string name="change_colour">Change Colour</string>
 </resources>
