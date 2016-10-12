@@ -38,11 +38,11 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
-    <EditText
+    <com.example.emanuel.notes.CustomEditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/text"
         android:layout_below="@+id/timeCreated"
-        android:inputType="text"/>
+        android:inputType="text" />
 
 </RelativeLayout>

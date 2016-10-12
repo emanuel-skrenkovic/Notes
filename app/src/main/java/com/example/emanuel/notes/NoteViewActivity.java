@@ -6,11 +6,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,7 +22,7 @@ public class NoteViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_view);
 
-        final EditText noteText = (EditText) findViewById(R.id.text);
+        final CustomEditText noteText = (CustomEditText) findViewById(R.id.text);
         TextView dateCreated = (TextView) findViewById(R.id.dateCreated);
         TextView timeCreated = (TextView) findViewById(R.id.timeCreated);
 
@@ -62,14 +58,12 @@ public class NoteViewActivity extends AppCompatActivity {
                     Note note = new Note(noteText.getText().toString(),
                             Calendar.getInstance().getTime());
                     if(intent.getExtras() != null) {
-                        sqlHelper.updateNote(
+                        sqlHelper.updateAtId(
                                 intent.getExtras().getInt("noteId"),
                                 note);
-                        Log.i("update: ", "Note updated");
                     } else {
                         if(note.getText() != null)
-                            sqlHelper.insertNote(note);
-                        Log.i("insert: ", "Note inserted");
+                            sqlHelper.insert(note);
                     }
 
                     Toast.makeText(NoteViewActivity.this, "Changes saved", Toast.LENGTH_SHORT)
@@ -79,25 +73,12 @@ public class NoteViewActivity extends AppCompatActivity {
                 }
                 return false;
         });
-        /*noteText.setOnFocusChangeListener((view, b) ->{
-                if(!b) {
-                    Note note = new Note(noteText.getText().toString(),
-                            Calendar.getInstance().getTime());
-                    if(intent.getExtras() != null) {
-                        sqlHelper.updateNote(
-                                intent.getExtras().getInt("noteId"),
-                                note);
-                        Log.i("update: ", "Note updated");
-                    } else {
-                        if(note.getText() != null)
-                            sqlHelper.insertNote(note);
-                        Log.i("insert: ", "Note inserted");
-                    }
 
-                    Toast.makeText(NoteViewActivity.this, "Changes saved", Toast.LENGTH_SHORT)
-                            .show();
-                }
-        });*/
+        noteText.setOnFocusChangeListener((view, hasFocus) -> {
+            if(!hasFocus) {
+                Toast.makeText(NoteViewActivity.this, "test test", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

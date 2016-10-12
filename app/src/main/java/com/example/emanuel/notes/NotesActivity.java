@@ -7,11 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -19,12 +16,11 @@ import android.widget.Toast;
 
 import java.util.List;
 
-import static com.example.emanuel.notes.R.id.notesListView;
-
 public class NotesActivity extends AppCompatActivity {
 
     private Cursor cursor;
     private SQLiteDatabase db;
+    private SimpleCursorAdapter notesListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,24 +30,6 @@ public class NotesActivity extends AppCompatActivity {
 
         NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
         ListView notesListView = (ListView) findViewById(R.id.notesListView);
-
-        try {
-            db = sqlHelper.getReadableDatabase();
-            cursor = sqlHelper.getAllNotes(db);
-
-            SimpleCursorAdapter notesListAdapter = new SimpleCursorAdapter(
-                    this,
-                    android.R.layout.simple_list_item_1,
-                    cursor,
-                    new String[]{sqlHelper.NOTETEXT},
-                    new int[]{android.R.id.text1},
-                    0
-            );
-            notesListView.setAdapter(notesListAdapter);
-        } catch(SQLException e) {
-            Toast.makeText(this, "Database error", Toast.LENGTH_SHORT)
-                    .show();
-        }
 
         Button newNote = (Button) findViewById(R.id.newNoteButton);
         newNote.setOnClickListener((view) -> {
@@ -77,6 +55,31 @@ public class NotesActivity extends AppCompatActivity {
                 NoteSQLHelper.getInstance(getApplicationContext())
                         .deleteDb(getApplicationContext())
         );
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ListView notesListView = (ListView) findViewById(R.id.notesListView);
+        NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+
+        try {
+            db = sqlHelper.getReadableDatabase();
+            cursor = sqlHelper.getAllNotes(db);
+
+            notesListAdapter = new SimpleCursorAdapter(
+                    this,
+                    android.R.layout.simple_list_item_1,
+                    cursor,
+                    new String[]{sqlHelper.NOTETEXT},
+                    new int[]{android.R.id.text1},
+                    0
+            );
+            notesListView.setAdapter(notesListAdapter);
+        } catch(SQLException e) {
+            Toast.makeText(this, "Database error", Toast.LENGTH_SHORT)
+                    .show();
+        }
 
         // also testing
         Cursor test = sqlHelper.getAllNotes(db);
@@ -104,9 +107,15 @@ public class NotesActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
         switch(item.getItemId()) {
             case R.id.action_delete_note:
+                ListView notesListView = (ListView) findViewById(R.id.notesListView);
+                long id = notesListView.getSelectedItemId();
+                NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+                sqlHelper.deleteAtId(0);
+
+                notesListAdapter.notifyDataSetChanged();
+
                 Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
                         .show();
                 return true;

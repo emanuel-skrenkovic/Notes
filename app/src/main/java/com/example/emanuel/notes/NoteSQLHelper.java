@@ -43,7 +43,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
 
     }
 
-    public void insertNote(Note note) {
+    public void insert(Note note) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues noteValues = new ContentValues();
         noteValues.put(NOTETEXT, note.getText());
@@ -53,7 +53,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void updateNote(long row_id ,Note note) {
+    public void updateAtId(long row_id , Note note) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues noteValues = new ContentValues();
         noteValues.put(NOTETEXT, note.getText());
@@ -63,12 +63,12 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deleteNote(long row_id) {
+    public void deleteAtId(long row_id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE,
                 ROW_ID + "= ?",
                 new String[]{Long.toString(row_id)});
-
+        db.close();
     }
 
     public Cursor getNoteAtId(int noteId, SQLiteDatabase db) {
