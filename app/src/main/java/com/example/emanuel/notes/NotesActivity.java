@@ -6,9 +6,12 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -31,16 +34,10 @@ public class NotesActivity extends AppCompatActivity {
         NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
         ListView notesListView = (ListView) findViewById(R.id.notesListView);
 
-        Button newNote = (Button) findViewById(R.id.newNoteButton);
-        newNote.setOnClickListener((view) -> {
-                Intent intent = new Intent(NotesActivity.this, NoteViewActivity.class);
-                startActivity(intent);
-        });
-
         notesListView.setOnItemClickListener((adapterView, view, i, l) ->{
             Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
             Intent intent = new Intent(NotesActivity.this, NoteViewActivity.class);
-            intent.putExtra("noteId", cursor.getInt(cursor.getColumnIndex("_id")));
+            intent.putExtra("noteId", cursor.getInt(cursor.getColumnIndex(sqlHelper.ROW_ID)));
             startActivity(intent);
         });
 
@@ -107,14 +104,14 @@ public class NotesActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch(item.getItemId()) {
             case R.id.action_delete_note:
-                ListView notesListView = (ListView) findViewById(R.id.notesListView);
-                long id = notesListView.getSelectedItemId();
                 NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
-                sqlHelper.deleteAtId(0);
-
+                sqlHelper.deleteAtId(info.id);
                 notesListAdapter.notifyDataSetChanged();
+                ListView notesView = (ListView) findViewById(R.id.notesListView);
+                ((SimpleCursorAdapter)notesView.getAdapter()).notifyDataSetChanged();
 
                 Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
                         .show();
@@ -127,9 +124,9 @@ public class NotesActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (cursor != null && db != null) {
+        if(cursor != null)
             cursor.close();
+        if(db != null)
             db.close();
-        }
     }
 }

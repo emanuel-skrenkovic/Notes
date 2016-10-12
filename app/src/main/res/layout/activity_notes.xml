@@ -10,15 +10,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.emanuel.notes.NotesActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/newNoteButton"
-        android:text="@string/new_note"
-        android:gravity="bottom"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true" />
+    <android.support.v7.widget.Toolbar
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize" />
 
     <Button
         android:layout_width="wrap_content"

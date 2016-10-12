@@ -53,40 +53,35 @@ public class NoteViewActivity extends AppCompatActivity {
             }
         }
 
-        noteText.setOnEditorActionListener((textView, i, keyEvent) -> {
-                if(i == EditorInfo.IME_ACTION_DONE) {
-                    Note note = new Note(noteText.getText().toString(),
-                            Calendar.getInstance().getTime());
-                    if(intent.getExtras() != null) {
-                        sqlHelper.updateAtId(
-                                intent.getExtras().getInt("noteId"),
-                                note);
-                    } else {
-                        if(note.getText() != null)
-                            sqlHelper.insert(note);
-                    }
-
-                    Toast.makeText(NoteViewActivity.this, "Changes saved", Toast.LENGTH_SHORT)
-                            .show();
-
-                    return true;
+        noteText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
+            if(actionId == EditorInfo.IME_ACTION_DONE) {
+                Note note = new Note(noteText.getText().toString(),
+                        Calendar.getInstance().getTime());
+                if(intent.getExtras() != null) {
+                    sqlHelper.updateAtId(
+                            intent.getExtras().getInt("noteId"),
+                            note);
+                } else if(note.getText() != null){
+                    sqlHelper.insert(note);
                 }
-                return false;
-        });
 
-        noteText.setOnFocusChangeListener((view, hasFocus) -> {
-            if(!hasFocus) {
-                Toast.makeText(NoteViewActivity.this, "test test", Toast.LENGTH_LONG).show();
+                dateCreated.setText(note.getDateCreated());
+                timeCreated.setText(note.getTimeCreated());
+
+                Toast.makeText(NoteViewActivity.this, "Changes saved", Toast.LENGTH_SHORT)
+                        .show();
+                return true;
             }
+            return false;
         });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(cursor != null && db != null) {
+        if(cursor != null)
             cursor.close();
+        if(db != null)
             db.close();
-        }
     }
 }

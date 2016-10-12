@@ -31,7 +31,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE notes ("
+        db.execSQL("CREATE TABLE " + TABLE + "("
                 + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + NOTETEXT + " TEXT,"
                 + DATECREATED + " TEXT,"
