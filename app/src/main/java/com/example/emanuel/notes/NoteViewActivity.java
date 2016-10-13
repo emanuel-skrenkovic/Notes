@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
@@ -18,6 +20,7 @@ public class NoteViewActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
     private Cursor cursor;
+    private boolean textChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,31 +57,33 @@ public class NoteViewActivity extends AppCompatActivity {
                         cursor.getColumnIndex(sqlHelper.TIMECREATED)
                 ));
             } catch(SQLException e) {
-                Toast.makeText(this, "Database error", Toast.LENGTH_SHORT)
+                Toast.makeText(this, R.string.db_error, Toast.LENGTH_SHORT)
                         .show();
             }
         }
 
         noteText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if(actionId == EditorInfo.IME_ACTION_DONE) {
-                Note note = new Note(noteText.getText().toString(),
-                        Calendar.getInstance().getTime());
-                if(intent.getExtras() != null) {
-                    sqlHelper.updateAtId(
-                            intent.getExtras().getInt("noteId"),
-                            note);
-                } else if(note.getText() != null){
-                    sqlHelper.insert(note);
-                }
-
-                dateCreated.setText(note.getDateCreated());
-                timeCreated.setText(note.getTimeCreated());
-
-                Toast.makeText(NoteViewActivity.this, "Changes saved", Toast.LENGTH_SHORT)
-                        .show();
+                updateDb();
                 return true;
             }
             return false;
+        });
+
+        noteText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textChanged = true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
 
@@ -95,5 +100,33 @@ public class NoteViewActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_note, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public void updateDb() {
+        Intent intent = getIntent();
+        CustomEditText noteText = (CustomEditText) findViewById(R.id.text);
+        TextView dateCreated = (TextView) findViewById(R.id.dateCreated);
+        TextView timeCreated = (TextView) findViewById(R.id.timeCreated);
+        NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+
+        Note note = new Note(noteText.getText().toString(),
+                Calendar.getInstance().getTime());
+        if(textChanged) {
+            if(intent.getExtras() != null) {
+                sqlHelper.updateAtId(
+                        intent.getExtras().getInt("noteId"),
+                        note);
+            } else if(note.getText() != null){
+                sqlHelper.insert(note);
+            }
+
+            dateCreated.setText(note.getDateCreated());
+            timeCreated.setText(note.getTimeCreated());
+
+            Toast.makeText(NoteViewActivity.this, R.string.changes_saved, Toast.LENGTH_SHORT)
+                    .show();
+        }
+        if(textChanged)
+            textChanged = false;
     }
 }

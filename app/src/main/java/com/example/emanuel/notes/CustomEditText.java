@@ -25,8 +25,8 @@ public class CustomEditText extends EditText {
     @Override
     public boolean onKeyPreIme(int keyCode, KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-            // update data here
-            //Toast.makeText(getContext(), "A Toast", Toast.LENGTH_SHORT).show();
+            NoteViewActivity parentActivity = (NoteViewActivity) getContext();
+            parentActivity.updateDb();
             dispatchKeyEvent(event);
             return false;
         }

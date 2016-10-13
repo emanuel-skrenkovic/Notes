@@ -8,4 +8,6 @@
     <string name="deleted">Note Deleted</string>
     <string name="test">Test</string>
     <string name="change_colour">Change Colour</string>
+    <string name="changes_saved">Changes Saved</string>
+    <string name="db_error">Database Error</string>
 </resources>

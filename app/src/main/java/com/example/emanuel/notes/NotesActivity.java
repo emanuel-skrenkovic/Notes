@@ -76,7 +76,7 @@ public class NotesActivity extends AppCompatActivity {
             );
             notesListView.setAdapter(notesListAdapter);
         } catch(SQLException e) {
-            Toast.makeText(this, "Database error", Toast.LENGTH_SHORT)
+            Toast.makeText(this, R.string.db_error, Toast.LENGTH_SHORT)
                     .show();
         }
 
