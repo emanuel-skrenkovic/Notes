@@ -89,6 +89,15 @@ public class NotesActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(cursor != null)
+            cursor.close();
+        if(db != null)
+            db.close();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
@@ -96,12 +105,14 @@ public class NotesActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_create_note) {
-            Intent intent = new Intent(this, NoteViewActivity.class);
-            startActivity(intent);
-            return true;
+        switch(item.getItemId()) {
+            case R.id.action_create_note:
+                Intent intent = new Intent(this, NoteViewActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -110,9 +121,9 @@ public class NotesActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.action_delete_note:
                 NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+                ListView notesView = (ListView) findViewById(R.id.notesListView);
                 sqlHelper.deleteAtId(info.id);
                 notesListAdapter.notifyDataSetChanged();
-                ListView notesView = (ListView) findViewById(R.id.notesListView);
                 ((SimpleCursorAdapter)notesView.getAdapter()).notifyDataSetChanged();
 
                 Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
@@ -121,14 +132,5 @@ public class NotesActivity extends AppCompatActivity {
             default:
                 return super.onContextItemSelected(item);
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if(cursor != null)
-            cursor.close();
-        if(db != null)
-            db.close();
     }
 }

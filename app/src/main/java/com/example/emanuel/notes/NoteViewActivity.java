@@ -83,17 +83,17 @@ public class NoteViewActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_note, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         if(cursor != null)
             cursor.close();
         if(db != null)
             db.close();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_note, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 }
