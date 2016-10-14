@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
@@ -126,6 +127,7 @@ public class NoteViewActivity extends AppCompatActivity {
             Toast.makeText(NoteViewActivity.this, R.string.changes_saved, Toast.LENGTH_SHORT)
                     .show();
         }
+
         if(textChanged)
             textChanged = false;
     }

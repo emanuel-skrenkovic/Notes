@@ -16,13 +16,10 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import java.util.List;
-
 public class NotesActivity extends AppCompatActivity {
 
     private Cursor cursor;
     private SQLiteDatabase db;
-    private SimpleCursorAdapter notesListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +61,9 @@ public class NotesActivity extends AppCompatActivity {
 
         try {
             db = sqlHelper.getReadableDatabase();
-            cursor = sqlHelper.getAllNotes(db);
+            cursor = sqlHelper.getAllNotes();
 
-            notesListAdapter = new SimpleCursorAdapter(
+            SimpleCursorAdapter notesListAdapter = new SimpleCursorAdapter(
                     this,
                     android.R.layout.simple_list_item_1,
                     cursor,
@@ -78,13 +75,6 @@ public class NotesActivity extends AppCompatActivity {
         } catch(SQLException e) {
             Toast.makeText(this, R.string.db_error, Toast.LENGTH_SHORT)
                     .show();
-        }
-
-        // also testing
-        Cursor test = sqlHelper.getAllNotes(db);
-        List<Note> list = sqlHelper.listNotes();
-        for(Note note : list) {
-            Log.i("text: ", note.getText());
         }
     }
 
@@ -123,8 +113,8 @@ public class NotesActivity extends AppCompatActivity {
                 NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
                 ListView notesView = (ListView) findViewById(R.id.notesListView);
                 sqlHelper.deleteAtId(info.id);
-                notesListAdapter.notifyDataSetChanged();
-                ((SimpleCursorAdapter)notesView.getAdapter()).notifyDataSetChanged();
+                ((SimpleCursorAdapter)notesView.getAdapter())
+                        .changeCursor(sqlHelper.getAllNotes());
 
                 Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
                         .show();

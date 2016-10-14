@@ -50,7 +50,6 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         noteValues.put(DATECREATED, note.getDateCreated());
         noteValues.put(TIMECREATED, note.getTimeCreated());
         db.insert(TABLE, null, noteValues);
-        db.close();
     }
 
     public void updateAtId(long row_id , Note note) {
@@ -60,7 +59,6 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         noteValues.put(DATECREATED, note.getDateCreated());
         noteValues.put(TIMECREATED, note.getTimeCreated());
         db.update(TABLE, noteValues, (ROW_ID + "=" + row_id), null);
-        db.close();
     }
 
     public void deleteAtId(long row_id) {
@@ -68,7 +66,6 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         db.delete(TABLE,
                 ROW_ID + "= ?",
                 new String[]{Long.toString(row_id)});
-        db.close();
     }
 
     public Cursor getNoteAtId(int noteId, SQLiteDatabase db) {
@@ -83,34 +80,13 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getAllNotes(SQLiteDatabase db) {
+    public Cursor getAllNotes() {
+        SQLiteDatabase db = this.getReadableDatabase();
         return db.query(
                 TABLE,
                 new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
                 null, null, null, null, null);
     }
-
-    // here for testing purposes
-    public List<Note> listNotes() {
-        List<Note> notesList = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query("notes",
-                new String[]{"NOTETEXT", "DATECREATED", "TIMECREATED"},
-                null, null, null, null, null);
-
-        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            Note note = new Note();
-            note.setText(cursor.getString(0));
-            note.setDateCreated(cursor.getString(1));
-            note.setTimeCreated(cursor.getString(2));
-            notesList.add(note);
-        }
-        cursor.close();
-        db.close();
-        return notesList;
-    }
-
 
     public void deleteDb(Context context) {
         context.deleteDatabase("notes.db");
