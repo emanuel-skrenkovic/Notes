@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
@@ -109,16 +108,21 @@ public class NoteViewActivity extends AppCompatActivity {
         TextView dateCreated = (TextView) findViewById(R.id.dateCreated);
         TextView timeCreated = (TextView) findViewById(R.id.timeCreated);
         NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+        db = sqlHelper.getWritableDatabase();
 
-        Note note = new Note(noteText.getText().toString(),
+        Note note = new Note(
+                sqlHelper.getAllNotes(db).getCount() + 1,
+                noteText.getText().toString(),
                 Calendar.getInstance().getTime());
+
         if(textChanged) {
             if(intent.getExtras() != null) {
                 sqlHelper.updateAtId(
                         intent.getExtras().getInt("noteId"),
-                        note);
+                        note,
+                        db);
             } else if(note.getText() != null){
-                sqlHelper.insert(note);
+                sqlHelper.insert(note, db);
             }
 
             dateCreated.setText(note.getDateCreated());
@@ -127,7 +131,6 @@ public class NoteViewActivity extends AppCompatActivity {
             Toast.makeText(NoteViewActivity.this, R.string.changes_saved, Toast.LENGTH_SHORT)
                     .show();
         }
-
         if(textChanged)
             textChanged = false;
     }

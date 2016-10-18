@@ -13,13 +13,12 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 public class NotesActivity extends AppCompatActivity {
 
-    private Cursor cursor;
     private SQLiteDatabase db;
+    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +33,8 @@ public class NotesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         notesListView.setOnItemClickListener((adapterView, view, i, l) ->{
-            Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
             Intent intent = new Intent(NotesActivity.this, NoteViewActivity.class);
-            intent.putExtra("noteId", cursor.getInt(cursor.getColumnIndex(sqlHelper.ROW_ID)));
+            intent.putExtra("noteId", i + 1);
             startActivity(intent);
         });
 
@@ -61,21 +59,24 @@ public class NotesActivity extends AppCompatActivity {
 
         try {
             db = sqlHelper.getReadableDatabase();
-            cursor = sqlHelper.getAllNotes();
+            cursor = sqlHelper.getAllNotes(db);
 
-            SimpleCursorAdapter notesListAdapter = new SimpleCursorAdapter(
-                    this,
-                    android.R.layout.simple_list_item_1,
-                    cursor,
-                    new String[]{sqlHelper.NOTETEXT},
-                    new int[]{android.R.id.text1},
-                    0
-            );
-            notesListView.setAdapter(notesListAdapter);
+            CustomListViewAdapter adapter = new CustomListViewAdapter(
+                    getApplicationContext(),
+                    sqlHelper.listNotes(db));
+
+            notesListView.setAdapter(adapter);
         } catch(SQLException e) {
             Toast.makeText(this, R.string.db_error, Toast.LENGTH_SHORT)
                     .show();
         }
+
+        // also testing
+        /*Cursor test = sqlHelper.getAllNotes(db);
+        List<Note> list = sqlHelper.listNotes(db);
+        for(Note note : list) {
+            Log.i("text: ", note.getText());
+        }*/
     }
 
     @Override
@@ -111,10 +112,11 @@ public class NotesActivity extends AppCompatActivity {
         switch(item.getItemId()) {
             case R.id.action_delete_note:
                 NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+                db = sqlHelper.getWritableDatabase();
                 ListView notesView = (ListView) findViewById(R.id.notesListView);
-                sqlHelper.deleteAtId(info.id);
-                ((SimpleCursorAdapter)notesView.getAdapter())
-                        .changeCursor(sqlHelper.getAllNotes());
+                sqlHelper.deleteAtId(
+                        notesView.getAdapter().getItemId(info.position),
+                        db);
 
                 Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
                         .show();

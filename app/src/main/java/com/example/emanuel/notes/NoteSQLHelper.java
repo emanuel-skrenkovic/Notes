@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 public class NoteSQLHelper extends SQLiteOpenHelper {
 
     private static NoteSQLHelper dbHelper;
+    private static final String DB_NAME = "notes.db";
     private static final String TABLE = "notes";
     public static final String ROW_ID = "_id";
     public static final String NOTETEXT= "NOTETEXT";
@@ -26,7 +28,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
     }
 
     private NoteSQLHelper(Context context) {
-        super(context, "notes.db", null, 1);
+        super(context, DB_NAME, null, 1);
     }
 
     @Override
@@ -43,8 +45,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
 
     }
 
-    public void insert(Note note) {
-        SQLiteDatabase db = this.getWritableDatabase();
+    public void insert(Note note, SQLiteDatabase db) {
         ContentValues noteValues = new ContentValues();
         noteValues.put(NOTETEXT, note.getText());
         noteValues.put(DATECREATED, note.getDateCreated());
@@ -52,8 +53,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         db.insert(TABLE, null, noteValues);
     }
 
-    public void updateAtId(long row_id , Note note) {
-        SQLiteDatabase db = this.getWritableDatabase();
+    public void updateAtId(long row_id , Note note, SQLiteDatabase db) {
         ContentValues noteValues = new ContentValues();
         noteValues.put(NOTETEXT, note.getText());
         noteValues.put(DATECREATED, note.getDateCreated());
@@ -61,8 +61,8 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         db.update(TABLE, noteValues, (ROW_ID + "=" + row_id), null);
     }
 
-    public void deleteAtId(long row_id) {
-        SQLiteDatabase db = this.getWritableDatabase();
+    public void deleteAtId(long row_id , SQLiteDatabase db) {
+        Log.i("Deleted at id", Long.toString(row_id));
         db.delete(TABLE,
                 ROW_ID + "= ?",
                 new String[]{Long.toString(row_id)});
@@ -80,13 +80,33 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getAllNotes() {
-        SQLiteDatabase db = this.getReadableDatabase();
+    public Cursor getAllNotes(SQLiteDatabase db) {
         return db.query(
                 TABLE,
                 new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
                 null, null, null, null, null);
     }
+
+    // here for testing purposes
+    public List<Note> listNotes(SQLiteDatabase db) {
+        List<Note> notesList = new ArrayList<>();
+
+        Cursor cursor = db.query("notes",
+                new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
+                null, null, null, null, null);
+
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            Note note = new Note();
+            note.setId(cursor.getLong(0));
+            note.setText(cursor.getString(1));
+            note.setDateCreated(cursor.getString(2));
+            note.setTimeCreated(cursor.getString(3));
+            notesList.add(note);
+        }
+        cursor.close();
+        return notesList;
+    }
+
 
     public void deleteDb(Context context) {
         context.deleteDatabase("notes.db");
