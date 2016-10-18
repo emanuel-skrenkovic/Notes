@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -32,9 +33,11 @@ public class NotesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.notesToolbar);
         setSupportActionBar(toolbar);
 
-        notesListView.setOnItemClickListener((adapterView, view, i, l) ->{
+        notesListView.setOnItemClickListener((adapterView, view, pos, id) ->{
             Intent intent = new Intent(NotesActivity.this, NoteViewActivity.class);
-            intent.putExtra("noteId", i + 1);
+            Log.i("listener id: ", Long.toString(notesListView.getAdapter().getItemId(pos)));
+            intent.putExtra("noteId",
+                    notesListView.getAdapter().getItemId(pos));
             startActivity(intent);
         });
 
@@ -70,13 +73,6 @@ public class NotesActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.db_error, Toast.LENGTH_SHORT)
                     .show();
         }
-
-        // also testing
-        /*Cursor test = sqlHelper.getAllNotes(db);
-        List<Note> list = sqlHelper.listNotes(db);
-        for(Note note : list) {
-            Log.i("text: ", note.getText());
-        }*/
     }
 
     @Override

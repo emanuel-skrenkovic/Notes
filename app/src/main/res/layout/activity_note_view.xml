@@ -47,6 +47,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/text"
         android:layout_below="@+id/lastChange"
-        android:inputType="text" />
+        android:inputType="textMultiLine"/>
 
 </RelativeLayout>

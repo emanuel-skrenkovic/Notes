@@ -68,16 +68,23 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
                 new String[]{Long.toString(row_id)});
     }
 
-    public Cursor getNoteAtId(int noteId, SQLiteDatabase db) {
+    public Note getNoteAtId(long noteId, SQLiteDatabase db) {
         Cursor cursor = db.query(
                 TABLE,
                 new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
                 ROW_ID + " = ?",
-                new String[] {Integer.toString(noteId)},
+                new String[] {Long.toString(noteId)},
                 null, null, null
         );
-        cursor.moveToFirst();
-        return cursor;
+        Note note = new Note();
+        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            note.setId(cursor.getLong(0));
+            note.setText(cursor.getString(1));
+            note.setDateCreated(cursor.getString(2));
+            note.setTimeCreated(cursor.getString(3));
+        }
+        cursor.close();
+        return note;
     }
 
     public Cursor getAllNotes(SQLiteDatabase db) {

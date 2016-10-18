@@ -45,7 +45,7 @@ public class CustomListViewAdapter extends BaseAdapter {
         TextView dateCreated = (TextView) view.findViewById(R.id.noteDateCreated);
 
         text.setText(currentNote.getText());
-        text.setText(currentNote.getDateCreated());
+        dateCreated.setText(currentNote.getDateCreated());
         return view;
     }
 

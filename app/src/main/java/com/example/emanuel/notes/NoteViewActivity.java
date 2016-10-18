@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
@@ -40,22 +41,17 @@ public class NoteViewActivity extends AppCompatActivity {
         final Intent intent = getIntent();
 
         if(intent.getExtras() != null) {
-            final int noteId = intent.getExtras().getInt("noteId");
+            final long noteId = intent.getExtras().getLong("noteId");
+            Log.i("notview id" , Long.toString(noteId));
 
             try{
                 db = sqlHelper.getReadableDatabase();
-                cursor = sqlHelper.getNoteAtId(noteId, db);
-                noteText.setText(cursor.getString(
-                        cursor.getColumnIndex(sqlHelper.NOTETEXT)
-                ));
+                Note note = sqlHelper.getNoteAtId(noteId, db);
+                noteText.setText(note.getText());
 
-                dateCreated.setText(cursor.getString(
-                        cursor.getColumnIndex(sqlHelper.DATECREATED)
-                ));
+                dateCreated.setText(note.getDateCreated());
 
-                timeCreated.setText(cursor.getString(
-                        cursor.getColumnIndex(sqlHelper.TIMECREATED)
-                ));
+                timeCreated.setText(note.getTimeCreated());
             } catch(SQLException e) {
                 Toast.makeText(this, R.string.db_error, Toast.LENGTH_SHORT)
                         .show();
