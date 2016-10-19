@@ -107,6 +107,10 @@ public class NotesActivity extends AppCompatActivity {
                         notesView.getAdapter().getItemId(info.position),
                         db);
 
+                ((CustomListViewAdapter)notesView.getAdapter())
+                        .refreshList(sqlHelper.
+                                getAllNotes(db));
+
                 Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
                         .show();
                 return true;

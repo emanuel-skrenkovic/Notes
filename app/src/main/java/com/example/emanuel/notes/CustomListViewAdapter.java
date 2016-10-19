@@ -49,4 +49,9 @@ public class CustomListViewAdapter extends BaseAdapter {
         return view;
     }
 
+    public void refreshList(List<Note> notes) {
+        this.notes = notes;
+        notifyDataSetChanged();
+    }
+
 }
