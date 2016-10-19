@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,6 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
     }
 
     public void deleteAtId(long row_id , SQLiteDatabase db) {
-        Log.i("Deleted at id", Long.toString(row_id));
         db.delete(TABLE,
                 ROW_ID + "= ?",
                 new String[]{Long.toString(row_id)});
@@ -91,7 +89,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
     public List<Note> getAllNotes(SQLiteDatabase db) {
         List<Note> notesList = new ArrayList<>();
 
-        Cursor cursor = db.query("notes",
+        Cursor cursor = db.query(TABLE,
                 new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
                 null, null, null, null, null);
 

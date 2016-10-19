@@ -1,7 +1,6 @@
 package com.example.emanuel.notes;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
