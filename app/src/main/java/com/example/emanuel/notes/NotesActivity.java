@@ -19,7 +19,6 @@ import android.widget.Toast;
 public class NotesActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
-    private Cursor cursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +61,10 @@ public class NotesActivity extends AppCompatActivity {
 
         try {
             db = sqlHelper.getReadableDatabase();
-            cursor = sqlHelper.getAllNotes(db);
 
             CustomListViewAdapter adapter = new CustomListViewAdapter(
                     getApplicationContext(),
-                    sqlHelper.listNotes(db));
+                    sqlHelper.getAllNotes(db));
 
             notesListView.setAdapter(adapter);
         } catch(SQLException e) {
@@ -78,8 +76,6 @@ public class NotesActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(cursor != null)
-            cursor.close();
         if(db != null)
             db.close();
     }

@@ -20,7 +20,6 @@ import java.util.Calendar;
 public class NoteViewActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
-    private Cursor cursor;
     private boolean textChanged = false;
 
     @Override
@@ -86,8 +85,6 @@ public class NoteViewActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(cursor != null)
-            cursor.close();
         if(db != null)
             db.close();
     }
@@ -107,14 +104,14 @@ public class NoteViewActivity extends AppCompatActivity {
         db = sqlHelper.getWritableDatabase();
 
         Note note = new Note(
-                sqlHelper.getAllNotes(db).getCount() + 1,
+                sqlHelper.getAllNotes(db).size() + 1,
                 noteText.getText().toString(),
                 Calendar.getInstance().getTime());
 
         if(textChanged) {
             if(intent.getExtras() != null) {
                 sqlHelper.updateAtId(
-                        intent.getExtras().getInt("noteId"),
+                        intent.getExtras().getLong("noteId"),
                         note,
                         db);
             } else if(note.getText() != null){

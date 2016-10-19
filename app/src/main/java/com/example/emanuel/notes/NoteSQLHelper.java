@@ -76,26 +76,19 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
                 new String[] {Long.toString(noteId)},
                 null, null, null
         );
+        cursor.moveToFirst();
+
         Note note = new Note();
-        for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            note.setId(cursor.getLong(0));
-            note.setText(cursor.getString(1));
-            note.setDateCreated(cursor.getString(2));
-            note.setTimeCreated(cursor.getString(3));
-        }
+        note.setId(cursor.getLong(0));
+        note.setText(cursor.getString(1));
+        note.setDateCreated(cursor.getString(2));
+        note.setTimeCreated(cursor.getString(3));
+
         cursor.close();
         return note;
     }
 
-    public Cursor getAllNotes(SQLiteDatabase db) {
-        return db.query(
-                TABLE,
-                new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
-                null, null, null, null, null);
-    }
-
-    // here for testing purposes
-    public List<Note> listNotes(SQLiteDatabase db) {
+    public List<Note> getAllNotes(SQLiteDatabase db) {
         List<Note> notesList = new ArrayList<>();
 
         Cursor cursor = db.query("notes",
@@ -114,7 +107,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         return notesList;
     }
 
-
+    //here for testing
     public void deleteDb(Context context) {
         context.deleteDatabase("notes.db");
     }
