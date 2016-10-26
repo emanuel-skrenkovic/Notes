@@ -10,4 +10,5 @@
     <string name="change_colour">Change Colour</string>
     <string name="changes_saved">Changes Saved</string>
     <string name="db_error">Database Error</string>
+    <string name="reminder">Reminder</string>
 </resources>

@@ -1,16 +1,20 @@
 package com.example.emanuel.notes;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -94,11 +98,25 @@ public class NoteViewActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.action_change_colour:
+                Bundle bundle = new Bundle();
+                bundle.putInt("background", R.color.colorPrimary);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     public void updateDb() {
         Intent intent = getIntent();
+
         CustomEditText noteText = (CustomEditText) findViewById(R.id.text);
         TextView dateCreated = (TextView) findViewById(R.id.dateCreated);
         TextView timeCreated = (TextView) findViewById(R.id.timeCreated);
+
         NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
         db = sqlHelper.getWritableDatabase();
 

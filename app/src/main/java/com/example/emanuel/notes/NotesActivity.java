@@ -1,10 +1,14 @@
 package com.example.emanuel.notes;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -98,11 +102,13 @@ public class NotesActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
         switch(item.getItemId()) {
             case R.id.action_delete_note:
-                NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
                 db = sqlHelper.getWritableDatabase();
+
                 ListView notesView = (ListView) findViewById(R.id.notesListView);
+
                 sqlHelper.deleteAtId(
                         notesView.getAdapter().getItemId(info.position),
                         db);
@@ -113,6 +119,32 @@ public class NotesActivity extends AppCompatActivity {
 
                 Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
                         .show();
+                return true;
+            case R.id.action_reminder:
+                db = sqlHelper.getReadableDatabase();
+
+                ListView view = (ListView) findViewById(R.id.notesListView);
+
+                Note note = sqlHelper.getNoteAtId(
+                        view.getAdapter().getItemId(info.position),
+                        db);
+
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.plus)
+                        .setContentTitle(note.getText())
+                        .setContentText(note.getDateCreated());
+                Intent notificationIntent = new Intent(this, NoteViewActivity.class);
+                notificationIntent.putExtra("noteId", view.getAdapter().getItemId(info.position));
+                PendingIntent pIntent = PendingIntent.getActivity(
+                        this,
+                        0,
+                        notificationIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+
+                builder.setContentIntent(pIntent);
+
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                manager.notify(0, builder.build());
                 return true;
             default:
                 return super.onContextItemSelected(item);

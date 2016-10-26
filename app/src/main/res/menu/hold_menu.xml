@@ -6,4 +6,9 @@
         android:title="@string/delete"
         android:orderInCategory="1" />
 
+    <item
+        android:id="@+id/action_reminder"
+        android:title="@string/reminder"
+        android:orderInCategory="2" />
+
 </menu>
