@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 public class ReminderActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
-    private long noteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +29,15 @@ public class ReminderActivity extends AppCompatActivity {
         LinearLayout clock = (LinearLayout) findViewById(R.id.clock);
         CheckBox pinToBar = (CheckBox) findViewById(R.id.pinToBar);
 
-        Button done = (Button) findViewById(R.id.done);
+        Button confirm = (Button) findViewById(R.id.confirm);
         Button cancel = (Button) findViewById(R.id.cancel);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.reminderToolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         db = sqlHelper.getReadableDatabase();
-        noteId = getIntent().getExtras().getLong("noteId");
+        long noteId = getIntent().getExtras().getLong("noteId");
 
         pinToBar.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked) {
@@ -50,8 +50,10 @@ public class ReminderActivity extends AppCompatActivity {
         Note note = sqlHelper.getNoteAtId(noteId, db);
         pinToBar.setChecked(note.isPinned());
 
-        done.setOnClickListener(view -> {
-           if(pinToBar.isChecked()) {
+        confirm.setOnClickListener(view -> {
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if(pinToBar.isChecked()) {
 
                NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                        .setSmallIcon(R.drawable.note)
@@ -73,12 +75,10 @@ public class ReminderActivity extends AppCompatActivity {
                note.setPinned(true);
                sqlHelper.updateAtId(noteId, note, db);
 
-               NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                manager.notify((int)noteId, builder.build());
            } else {
                note.setPinned(false);
                sqlHelper.updateAtId(noteId, note, db);
-               NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                manager.cancel((int) noteId);
            }
            onBackPressed();
