@@ -21,6 +21,7 @@ import android.widget.Toast;
 public class NotesActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
+    private ListView notesListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +29,12 @@ public class NotesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notes);
         Log.i("test: ", "onCreate called");
 
-        ListView notesListView = (ListView) findViewById(R.id.notesListView);
+        notesListView = (ListView) findViewById(R.id.notesListView);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.notesToolbar);
         setSupportActionBar(toolbar);
 
-        notesListView.setOnItemClickListener((adapterView, view, pos, id) ->{
+        notesListView.setOnItemClickListener((adapterView, view, pos, id) -> {
             Intent intent = new Intent(NotesActivity.this, NoteViewActivity.class);
             Log.i("listener id: ", Long.toString(notesListView.getAdapter().getItemId(pos)));
             intent.putExtra("noteId",
@@ -41,7 +42,7 @@ public class NotesActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        notesListView.setOnCreateContextMenuListener((contextMenu, view, contextMenuInfo) ->{
+        notesListView.setOnCreateContextMenuListener((contextMenu, view, contextMenuInfo) -> {
             super.onCreateContextMenu(contextMenu, view, contextMenuInfo);
             getMenuInflater().inflate(R.menu.hold_menu, contextMenu);
         });
@@ -107,13 +108,11 @@ public class NotesActivity extends AppCompatActivity {
             case R.id.action_delete_note:
                 db = sqlHelper.getWritableDatabase();
 
-                ListView notesView = (ListView) findViewById(R.id.notesListView);
-
                 sqlHelper.deleteAtId(
-                        notesView.getAdapter().getItemId(info.position),
+                        notesListView.getAdapter().getItemId(info.position),
                         db);
 
-                ((CustomListViewAdapter)notesView.getAdapter())
+                ((CustomListViewAdapter)notesListView.getAdapter())
                         .refreshList(sqlHelper.
                                 getAllNotes(db));
 
@@ -121,31 +120,9 @@ public class NotesActivity extends AppCompatActivity {
                         .show();
                 return true;
             case R.id.action_reminder:
-                db = sqlHelper.getReadableDatabase();
-
-                ListView view = (ListView) findViewById(R.id.notesListView);
-
-                Note note = sqlHelper.getNoteAtId(
-                        view.getAdapter().getItemId(info.position),
-                        db);
-
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.plus)
-                        .setContentTitle(note.getText())
-                        .setContentText(note.getDateCreated());
-                Intent notificationIntent = new Intent(this, NoteViewActivity.class);
-                notificationIntent.putExtra("noteId", view.getAdapter().getItemId(info.position));
-                PendingIntent pIntent = PendingIntent.getActivity(
-                        this,
-                        0,
-                        notificationIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-
-                builder.setContentIntent(pIntent);
-
-                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.notify(0, builder.build());
-                return true;
+                Intent reminderIntent = new Intent(this, ReminderActivity.class);
+                reminderIntent.putExtra("noteId", notesListView.getAdapter().getItemId(info.position));
+                startActivity(reminderIntent);
             default:
                 return super.onContextItemSelected(item);
         }

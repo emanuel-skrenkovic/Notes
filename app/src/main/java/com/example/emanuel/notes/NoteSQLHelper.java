@@ -18,6 +18,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
     public static final String NOTETEXT= "NOTETEXT";
     public static final String DATECREATED = "DATECREATED";
     public static final String TIMECREATED = "TIMECREATED";
+    public static final String PINNED = "PINNED";
 
     public static synchronized NoteSQLHelper getInstance(Context context) {
         if(dbHelper == null) {
@@ -36,7 +37,8 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
                 + ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + NOTETEXT + " TEXT,"
                 + DATECREATED + " TEXT,"
-                + TIMECREATED + " TEXT);");
+                + TIMECREATED + " TEXT,"
+                + PINNED + " INTEGER DEFAULT 0);");
     }
 
     @Override
@@ -49,6 +51,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         noteValues.put(NOTETEXT, note.getText());
         noteValues.put(DATECREATED, note.getDateCreated());
         noteValues.put(TIMECREATED, note.getTimeCreated());
+        noteValues.put(PINNED, note.isPinned());
         db.insert(TABLE, null, noteValues);
     }
 
@@ -57,6 +60,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         noteValues.put(NOTETEXT, note.getText());
         noteValues.put(DATECREATED, note.getDateCreated());
         noteValues.put(TIMECREATED, note.getTimeCreated());
+        noteValues.put(PINNED, note.isPinned());
         db.update(TABLE, noteValues, (ROW_ID + "=" + row_id), null);
     }
 
@@ -69,7 +73,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
     public Note getNoteAtId(long noteId, SQLiteDatabase db) {
         Cursor cursor = db.query(
                 TABLE,
-                new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
+                new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED, PINNED},
                 ROW_ID + " = ?",
                 new String[] {Long.toString(noteId)},
                 null, null, null
@@ -81,6 +85,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         note.setText(cursor.getString(1));
         note.setDateCreated(cursor.getString(2));
         note.setTimeCreated(cursor.getString(3));
+        note.setPinned(cursor.getInt(4) != 0);
 
         cursor.close();
         return note;
@@ -90,7 +95,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
         List<Note> notesList = new ArrayList<>();
 
         Cursor cursor = db.query(TABLE,
-                new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED},
+                new String[]{ROW_ID, NOTETEXT, DATECREATED, TIMECREATED, PINNED},
                 null, null, null, null, null);
 
         for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -99,6 +104,7 @@ public class NoteSQLHelper extends SQLiteOpenHelper {
             note.setText(cursor.getString(1));
             note.setDateCreated(cursor.getString(2));
             note.setTimeCreated(cursor.getString(3));
+            note.setPinned(cursor.getInt(4) != 0);
             notesList.add(note);
         }
         cursor.close();

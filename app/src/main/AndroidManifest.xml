@@ -15,8 +15,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NoteViewActivity"
-            android:parentActivityName="com.example.emanuel.notes.NotesActivity"></activity>
+        <activity
+            android:name=".NoteViewActivity"
+            android:parentActivityName=".NotesActivity" />
+        <activity android:name=".ReminderActivity"></activity>
     </application>
 
 </manifest>

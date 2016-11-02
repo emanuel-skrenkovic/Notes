@@ -10,6 +10,7 @@ public class Note {
     private String text;
     private String dateCreated;
     private String timeCreated;
+    private boolean pinned = false;
 
     public Note() {
 
@@ -54,6 +55,14 @@ public class Note {
 
     public void setTimeCreated(String timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 
 }

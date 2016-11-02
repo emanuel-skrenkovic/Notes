@@ -10,5 +10,7 @@
     <string name="change_colour">Change Colour</string>
     <string name="changes_saved">Changes Saved</string>
     <string name="db_error">Database Error</string>
-    <string name="reminder">Reminder</string>
+    <string name="reminder">Set Reminder</string>
+    <string name="pin_to_bar">Pin to status bar</string>
+    <string name="double_zero">00</string>
 </resources>
