@@ -6,6 +6,21 @@
         android:id="@+id/action_change_colour"
         android:title="@string/change_colour"
         android:icon="@drawable/paint_can"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item
+                android:id="@+id/red"
+                android:title="red"
+                android:orderInCategory="1" />
+
+            <item
+                android:id="@+id/blue"
+                android:title="blue"
+                android:orderInCategory="2" />
+        </menu>
+    </item>
+
+
 
 </menu>

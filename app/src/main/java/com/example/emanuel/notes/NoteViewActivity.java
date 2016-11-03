@@ -101,9 +101,11 @@ public class NoteViewActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
-            case R.id.action_change_colour:
-                Bundle bundle = new Bundle();
-                bundle.putInt("background", R.color.colorPrimary);
+            case R.id.red:
+                Toast.makeText(this, "red", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.blue:
+                Toast.makeText(this, "blue", Toast.LENGTH_SHORT).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -121,22 +123,32 @@ public class NoteViewActivity extends AppCompatActivity {
         db = sqlHelper.getWritableDatabase();
 
         Note note = new Note(
-                sqlHelper.getAllNotes(db).size() + 1,
+                (intent.getExtras() != null)
+                        ? intent.getExtras().getLong("noteId")
+                        : sqlHelper.getAllNotes(db).size() + 1,
                 noteText.getText().toString(),
-                Calendar.getInstance().getTime());
+                Calendar.getInstance().getTime()
+        );
+        Log.i("note id is ", Long.toString(note.getId()));
+
+        if(intent.getExtras() != null && sqlHelper.getNoteAtId(intent.getExtras().getLong("noteId"), db).isPinned())
+            note.setPinned(sqlHelper.getNoteAtId(intent.getExtras().getLong("noteId"), db).isPinned());
 
         if(textChanged) {
             if(intent.getExtras() != null) {
                 sqlHelper.updateAtId(
-                        intent.getExtras().getLong("noteId"),
+                        note.getId(),
                         note,
                         db);
-            } else if(note.getText() != null){
+            } else if(noteText.getText() != null){
                 sqlHelper.insert(note, db);
             }
 
             dateCreated.setText(note.getDateCreated());
             timeCreated.setText(note.getTimeCreated());
+
+            if(note.isPinned())
+                NotificationHandler.postNotification(this, note, db);
 
             Toast.makeText(NoteViewActivity.this, R.string.changes_saved, Toast.LENGTH_SHORT)
                     .show();
