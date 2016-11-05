@@ -10,7 +10,8 @@ public class NotificationHandler {
 
 	public static void postNotification(Context context, Note note, SQLiteDatabase db) {
 		NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(context);
-		android.app.NotificationManager manager = (android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		android.app.NotificationManager manager =
+				(android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 				.setSmallIcon(R.drawable.note)
@@ -33,5 +34,17 @@ public class NotificationHandler {
 		sqlHelper.updateAtId(note.getId(), note, db);
 
 		manager.notify((int)note.getId(), builder.build());
+	}
+
+	public static void cancelNotification(Context context, Note note, SQLiteDatabase db) {
+		android.app.NotificationManager manager =
+				(android.app.NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(context);
+
+		note.setPinned(false);
+		sqlHelper.updateAtId(note.getId(), note, db);
+
+		manager.cancel((int)note.getId());
 	}
 }
