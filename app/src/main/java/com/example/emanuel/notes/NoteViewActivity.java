@@ -128,8 +128,12 @@ public class NoteViewActivity extends AppCompatActivity {
         );
         Log.i("note id is ", Long.toString(note.getId()));
 
-        if(intent.getExtras() != null && sqlHelper.getNoteAtId(intent.getExtras().getLong("noteId"), db).isPinned())
-            note.setPinned(sqlHelper.getNoteAtId(intent.getExtras().getLong("noteId"), db).isPinned());
+        if(intent.getExtras() != null) {
+            long noteId = intent.getExtras().getLong("noteId");
+            note.setPinned(
+                    sqlHelper.getNoteAtId(noteId, db).isPinned()
+            );
+        }
 
         if(textChanged) {
             if(intent.getExtras() != null) {
