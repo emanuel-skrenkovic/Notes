@@ -126,6 +126,7 @@ public class NoteViewActivity extends AppCompatActivity {
 
         if(intent.getExtras() != null) {
             long noteId = intent.getExtras().getLong(NOTE_ID);
+            note.setId(noteId);
             note.setPinned(
                     sqlHelper.getNoteAtId(noteId, db).isPinned()
             );
