@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.emanuel.notes.Notification.NotificationHandler;
+
 public class NotesActivity extends AppCompatActivity {
 
     private SQLiteDatabase db;
@@ -100,9 +102,18 @@ public class NotesActivity extends AppCompatActivity {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+
         switch(item.getItemId()) {
             case R.id.action_delete_note:
                 db = sqlHelper.getWritableDatabase();
+
+                Note note = sqlHelper.getNoteAtId(
+                        notesListView.getAdapter().getItemId(info.position),
+                        db);
+
+                if(note.isPinned()) {
+                    NotificationHandler.cancelNotification(this, note, db);
+                }
 
                 sqlHelper.deleteAtId(
                         notesListView.getAdapter().getItemId(info.position),

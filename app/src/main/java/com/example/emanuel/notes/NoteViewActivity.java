@@ -15,17 +15,27 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.emanuel.notes.Notification.NotificationHandler;
+
 import java.util.Calendar;
 
 public class NoteViewActivity extends AppCompatActivity {
 
+    private NoteSQLHelper sqlHelper;
     private SQLiteDatabase db;
     private boolean textChanged = false;
+    private Intent intent;
+
+    private final String NOTE_ID = "noteId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_view);
+
+        sqlHelper = NoteSQLHelper.getInstance(this);
+        intent = getIntent();
+        db = sqlHelper.getWritableDatabase();
 
         final CustomEditText noteText = (CustomEditText) findViewById(R.id.text);
         TextView dateCreated = (TextView) findViewById(R.id.dateCreated);
@@ -37,10 +47,8 @@ public class NoteViewActivity extends AppCompatActivity {
 
         final NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
 
-        final Intent intent = getIntent();
-
         if(intent.getExtras() != null) {
-            final long noteId = intent.getExtras().getLong("noteId");
+            final long noteId = intent.getExtras().getLong(NOTE_ID);
             Log.i("notview id" , Long.toString(noteId));
 
             try{
@@ -59,7 +67,39 @@ public class NoteViewActivity extends AppCompatActivity {
 
         noteText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if(actionId == EditorInfo.IME_ACTION_DONE) {
-                updateDb();
+                Note note = new Note();
+
+                if(intent != null) {
+                    note = sqlHelper.getNoteAtId(
+                            intent.getExtras().getLong(NOTE_ID), db);
+                } else {
+                    note = new Note();
+                }
+
+
+                if(textChanged) {
+                    if(intent.getExtras() != null) {
+                        sqlHelper.updateAtId(
+                                note.getId(),
+                                note,
+                                db);
+                    } else if(noteText.getText() != null){
+                        sqlHelper.insert(note, db);
+                    }
+
+                    dateCreated.setText(note.getDateCreated());
+                    timeCreated.setText(note.getTimeCreated());
+
+                    if(note.isPinned())
+                        NotificationHandler.postNotification(this, note, db);
+
+                    Toast.makeText(
+                            NoteViewActivity.this, R.string.changes_saved, Toast.LENGTH_SHORT)
+                            .show();
+                }
+                if(textChanged)
+                    textChanged = false;
+
                 return true;
             }
             return false;
@@ -109,27 +149,15 @@ public class NoteViewActivity extends AppCompatActivity {
         }
     }
 
-    public void updateDb() {
-        Intent intent = getIntent();
-
+    public void saveOnTextChange() {
         CustomEditText noteText = (CustomEditText) findViewById(R.id.text);
         TextView dateCreated = (TextView) findViewById(R.id.dateCreated);
         TextView timeCreated = (TextView) findViewById(R.id.timeCreated);
 
-        NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
-        db = sqlHelper.getWritableDatabase();
-
-        Note note = new Note(
-                (intent.getExtras() != null)
-                        ? intent.getExtras().getLong("noteId")
-                        : sqlHelper.getAllNotes(db).size() + 1,
-                noteText.getText().toString(),
-                Calendar.getInstance().getTime()
-        );
-        Log.i("note id is ", Long.toString(note.getId()));
+        Note note = new Note(noteText.getText().toString(), Calendar.getInstance().getTime());
 
         if(intent.getExtras() != null) {
-            long noteId = intent.getExtras().getLong("noteId");
+            long noteId = intent.getExtras().getLong(NOTE_ID);
             note.setPinned(
                     sqlHelper.getNoteAtId(noteId, db).isPinned()
             );
@@ -137,10 +165,7 @@ public class NoteViewActivity extends AppCompatActivity {
 
         if(textChanged) {
             if(intent.getExtras() != null) {
-                sqlHelper.updateAtId(
-                        note.getId(),
-                        note,
-                        db);
+                sqlHelper.updateAtId(intent.getExtras().getLong(NOTE_ID), note, db);
             } else if(noteText.getText() != null){
                 sqlHelper.insert(note, db);
             }

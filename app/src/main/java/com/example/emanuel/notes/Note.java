@@ -16,10 +16,9 @@ public class Note {
 
     }
 
-    public Note(long id, String text, Date date) {
+    public Note(String text, Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-        this.id = id;
         this.text = text;
         this.dateCreated = dateFormat.format(date);
         this.timeCreated = timeFormat.format(date);

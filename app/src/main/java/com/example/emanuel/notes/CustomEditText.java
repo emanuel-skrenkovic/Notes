@@ -26,7 +26,7 @@ public class CustomEditText extends EditText {
     public boolean onKeyPreIme(int keyCode, KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             NoteViewActivity parentActivity = (NoteViewActivity) getContext();
-            parentActivity.updateDb();
+            parentActivity.saveOnTextChange();
             dispatchKeyEvent(event);
             return false;
         }
