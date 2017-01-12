@@ -67,39 +67,7 @@ public class NoteViewActivity extends AppCompatActivity {
 
         noteText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if(actionId == EditorInfo.IME_ACTION_DONE) {
-                Note note = new Note();
-
-                if(intent != null) {
-                    note = sqlHelper.getNoteAtId(
-                            intent.getExtras().getLong(NOTE_ID), db);
-                } else {
-                    note = new Note();
-                }
-
-
-                if(textChanged) {
-                    if(intent.getExtras() != null) {
-                        sqlHelper.updateAtId(
-                                note.getId(),
-                                note,
-                                db);
-                    } else if(noteText.getText() != null){
-                        sqlHelper.insert(note, db);
-                    }
-
-                    dateCreated.setText(note.getDateCreated());
-                    timeCreated.setText(note.getTimeCreated());
-
-                    if(note.isPinned())
-                        NotificationHandler.postNotification(this, note, db);
-
-                    Toast.makeText(
-                            NoteViewActivity.this, R.string.changes_saved, Toast.LENGTH_SHORT)
-                            .show();
-                }
-                if(textChanged)
-                    textChanged = false;
-
+                saveOnTextChange();
                 return true;
             }
             return false;
