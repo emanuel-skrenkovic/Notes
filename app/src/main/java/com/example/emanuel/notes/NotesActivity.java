@@ -18,6 +18,7 @@ import com.example.emanuel.notes.Notification.NotificationHandler;
 
 public class NotesActivity extends AppCompatActivity {
 
+    private NoteSQLHelper sqlHelper;
     private SQLiteDatabase db;
     private ListView notesListView;
 
@@ -25,7 +26,8 @@ public class NotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
-        Log.i("test: ", "onCreate called");
+
+        sqlHelper = NoteSQLHelper.getInstance(this);
 
         notesListView = (ListView) findViewById(R.id.notesListView);
 
@@ -101,37 +103,39 @@ public class NotesActivity extends AppCompatActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        NoteSQLHelper sqlHelper = NoteSQLHelper.getInstance(this);
+        long id = notesListView.getAdapter().getItemId(info.position);
 
         switch(item.getItemId()) {
             case R.id.action_delete_note:
-                db = sqlHelper.getWritableDatabase();
-
-                Note note = sqlHelper.getNoteAtId(
-                        notesListView.getAdapter().getItemId(info.position),
-                        db);
-
-                if(note.isPinned()) {
-                    NotificationHandler.cancelNotification(this, note, db);
-                }
-
-                sqlHelper.deleteAtId(
-                        notesListView.getAdapter().getItemId(info.position),
-                        db);
-
-                ((CustomListViewAdapter)notesListView.getAdapter())
-                        .refreshList(sqlHelper.
-                                getAllNotes(db));
-
-                Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT)
-                        .show();
+                deleteNote(id);
+                Toast.makeText(this, R.string.deleted, Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_reminder:
-                Intent reminderIntent = new Intent(this, ReminderActivity.class);
-                reminderIntent.putExtra("noteId", notesListView.getAdapter().getItemId(info.position));
-                startActivity(reminderIntent);
+                goToReminderActivity(id);
             default:
                 return super.onContextItemSelected(item);
         }
+    }
+
+    private void deleteNote(long id) {
+        db = sqlHelper.getWritableDatabase();
+
+        Note note = sqlHelper.getNoteAtId(id, db);
+
+        if(note.isPinned()) {
+            NotificationHandler.cancelNotification(this, note, db);
+        }
+
+        sqlHelper.deleteAtId(id,db);
+
+        ((CustomListViewAdapter)notesListView.getAdapter())
+                .refreshList(sqlHelper.
+                        getAllNotes(db));
+    }
+
+    private void goToReminderActivity(long id) {
+        Intent reminderIntent = new Intent(this, ReminderActivity.class);
+        reminderIntent.putExtra("noteId", id);
+        startActivity(reminderIntent);
     }
 }

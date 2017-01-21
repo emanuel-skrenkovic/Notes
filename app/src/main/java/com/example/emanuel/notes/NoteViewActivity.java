@@ -49,7 +49,6 @@ public class NoteViewActivity extends AppCompatActivity {
 
         if(intent.getExtras() != null) {
             final long noteId = intent.getExtras().getLong(NOTE_ID);
-            Log.i("notview id" , Long.toString(noteId));
 
             try{
                 db = sqlHelper.getReadableDatabase();
